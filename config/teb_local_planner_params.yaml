@@ -5,62 +5,98 @@ TebLocalPlannerROS:
  # Trajectory
   
  teb_autosize: True
- dt_ref: 0.3
+ #length of the bot
+ dt_ref: 0.3 #0.3
  dt_hysteresis: 0.1
- global_plan_overwrite_orientation: True
- global_plan_viapoint_sep: 0.4
+ #not used for 2d planning
+ global_plan_overwrite_orientation: false #True
+ #same with resolution of costmap
+ #a bit expensive in calculation
+ global_plan_viapoint_sep: 0.05
  allow_init_with_backwards_motion: True
- max_global_plan_lookahead_dist: 2.0
+ #using maximal reach of our sensor
+ max_global_plan_lookahead_dist: 3.0 #2.0
  feasibility_check_no_poses: 5
     
- # Robot
-         
+ # Robot       
+ #given speead limit 0.5
  max_vel_x: 0.5
- max_vel_x_backwards: 0.4
- weight_kinematics_nh: 0.2
- max_vel_y: 0.15
- max_vel_theta: 0.15
- acc_lim_x: 2.5
- acc_lim_theta: 2.5
+ max_vel_x_backwards: 0.5 #0.4
+ #weight_kinematics_nh: 0.1 #0.2
+ #holomonic
+ #too fast in y direction will cause camera blur
+ max_vel_y: 0.4 #0.15
+ #maximal, no limit 
+ max_vel_theta: 1000 #0.15
+ #for better realtime response
+ acc_lim_x: 2.5 #2.5
+ #more RT response need for y
+ acc_lim_y: 2 #2.5
+ acc_lim_theta: 2.5 #2.5
+ #we are holonomic robot
  min_turning_radius: 0.0 # diff-drive robot (can turn on place!)
 
+#size of ep: 32*24 
+#consider toleranz 5 cm
+#the side and tail is easy to collide, since there's no camera, need bigger safe zone
  footprint_model:
    type: "polygon"
-   vertices: [[-0.145, -0.145], [-0.145, 0.145], [0.145, 0.145], [0.145, -0.145]]
+   vertices: [[-0.14, -0.12], [-0.14, 0.12], [0.14, 0.12], [0.14, -0.12]] 
+   #[[-0.145, -0.145], [-0.145, 0.145], [0.145, 0.145], [0.145, -0.145]]
 
  # GoalTolerance
-    
- xy_goal_tolerance: 0.2
- yaw_goal_tolerance: 0.3
- free_goal_vel: False
+ #a bit regressive for simulation   
+ xy_goal_tolerance: 0.04  #0.2
+ yaw_goal_tolerance:  0.02 #0.3
+ # may smoother and faster
+ free_goal_vel: true #false
     
  # Obstacles
-    
- min_obstacle_dist: 0.2 # This value must also include our robot radius, since footprint_model is set to "point".
+ 
+ 
+ #set small since it's already polygon
+ #decide of the robot can go trough narrow area
+ min_obstacle_dist: 0.03 #0.2 
+ #for RT obstacle avoidance 
  include_costmap_obstacles: True
- costmap_obstacles_behind_robot_dist: 1.5
+ #try
+ costmap_obstacles_behind_robot_dist: 1.5 #1.5
  obstacle_poses_affected: 30
+
+ #rasie performance
  costmap_converter_plugin: "point"
  costmap_converter_spin_thread: True
- costmap_converter_rate: 5
- inflaion_dist: 0.4
+ costmap_converter_rate: 10 #5
+
+ #crazy steep inflation curve
+ #aim to make global obstacle more punishment
+ #could cause more bouncing back 
+ #inflaion_dist: 0.55 #0.4
+ #cost_scaling_factor: 55
+
  # Optimization
     
  no_inner_iterations: 5
  no_outer_iterations: 4
  optimization_activate: True
- optimization_verbose: False
- penalty_epsilon: 0.1
- weight_max_vel_x: 2
- weight_max_vel_theta: 1
+ optimization_verbose: True
+#set high to make it quicker 
+ penalty_epsilon: 0.1 #0.1
+ weight_max_vel_x: 1
+ weight_max_vel_theta: 2
  weight_acc_lim_x: 1
  weight_acc_lim_theta: 1
- weight_kinematics_nh: 1000
- weight_kinematics_forward_drive: 1
- weight_kinematics_turning_radius: 0.5
- weight_optimaltime: 1
- weight_obstacle: 50
- weight_dynamic_obstacle: 10 # not in use yet
+ #we don't bother move in y
+ weight_kinematics_nh: 0 #1000
+ #take more advantage of the camera, make it not easy to loose tracing
+ weight_kinematics_forward_drive: 1.05 #1
+ #smaller -> flexibler
+ weight_kinematics_turning_radius: 0 #0.5
+ #drive steady if smaller
+ weight_optimaltime: 1 #1
+# stricter since we don't want to hit the box
+ weight_obstacle:  50 #50
+ weight_dynamic_obstacle: 10 #10 # not in use yet
  weight_adapt_factor: 2
  weight_inflation: 0.2
 

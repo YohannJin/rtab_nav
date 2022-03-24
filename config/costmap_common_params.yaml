@@ -16,22 +16,23 @@
 
 #将机器人的几何参数告诉导航功能包集，footprint表示多边形面积，robot_radius表示圆形
 #footprint: [[0.145, 0.145], [0.145, -0.145], [-0.145, -0.145], [-0.145, 0.145]] 
-footprint: [[-0.145, -0.145], [-0.145, 0.145], [0.145, 0.145], [0.145, -0.145]] 
+footprint: [[-0.14, -0.12], [-0.14, 0.12], [0.14, 0.12], [0.14, -0.12]]   
 #robot_radius: 0.175
 
 obstacle_layer: 
   enabled: true
   combination_method: 1
   track_unknown_space: true
+  #2.5
   obstacle_range: 2.5
   raytrace_range: 3.5
   observation_sources: camera_scan
   camera_scan: {sensor_frame: camera_aligned_depth_to_color_frame, data_type: LaserScan, topic: camera/scan, marking: true, clearing: true, inf_is_valid: true}
-#膨胀半径，扩展在碰撞区域以外的代价区域，给定机器人与障碍物之间必须要保持的最小距离
+#crazy steep insfaltion curve for big punishment
 inflation_layer: 
   enabled: true
-  cost_scaling_factor: 2.58
-  inflation_radius: 0.3
+  cost_scaling_factor: 4
+  inflation_radius: 0.45
 #代价地图精度，即每个网格的尺寸
 static_layer: 
   enabled: true
