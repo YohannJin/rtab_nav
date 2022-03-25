@@ -2,6 +2,9 @@
 <launch>
   <include file="$(find rtab_navigation)/launch/depthimage_to_laserscan.launch"/>
   <include file="$(find rtab_navigation)/launch/move_base.launch"/>
+  <include file="$(find robo)/launch/robo.launch"/>
+
+  
   <!-- robot_description -->
   <include file="$(find ep_description)/launch/ep_description.launch"/>
   <include file="$(find ep_teleop)/launch/joy_stick.launch"/>
